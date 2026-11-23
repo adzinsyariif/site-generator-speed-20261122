@@ -14,6 +14,11 @@ import { setFlagsFromString } from 'node:v8';
 // V8's incremental marking off, set before solve.js is imported so all of
 // its work runs under it.
 setFlagsFromString('--no-incremental-marking');
+// The entry runs once, cold, per grading container: TurboFan's optimizing
+// compiles cost more CPU than one pass over the cases can repay, and the
+// concurrent recompilation threads burn the same single-CPU budget. Off.
+setFlagsFromString('--no-turbofan');
+setFlagsFromString('--no-concurrent-recompilation');
 
 /** solve.js, imported by its URL (a .js module carries no types) and typed by its contract. */
 const { run } = (await import(new URL('./solve.js', import.meta.url).href)) as {
